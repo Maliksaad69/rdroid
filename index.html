@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ReDroid Hardened Android Environment — Developer Setup Guide</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #0f172a;
+    --surface: #1e293b;
+    --surface2: #263548;
+    --border: #334155;
+    --text: #e2e8f0;
+    --text-dim: #94a3b8;
+    --accent: #38bdf8;
+    --accent2: #818cf8;
+    --green: #34d399;
+    --red: #f87171;
+    --orange: #fb923c;
+    --yellow: #fbbf24;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+
+  .page-break { page-break-before: always; }
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 50px;
+  }
+
+  /* ─── Cover Page ─── */
+  .cover {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background: linear-gradient(135deg, #0f172a 0%, #1a1a3e 40%, #1e293b 100%);
+    padding: 80px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: -200px; right: -200px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(56,189,248,0.08) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .cover::after {
+    content: '';
+    position: absolute;
+    bottom: -200px; left: -200px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(129,140,248,0.06) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .cover .badge {
+    background: rgba(56,189,248,0.12);
+    border: 1px solid rgba(56,189,248,0.3);
+    color: var(--accent);
+    padding: 6px 18px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 30px;
+    position: relative;
+  }
+  .cover h1 {
+    font-size: 42px;
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, #e2e8f0, #38bdf8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    position: relative;
+  }
+  .cover .subtitle {
+    font-size: 18px;
+    color: var(--text-dim);
+    max-width: 600px;
+    margin-bottom: 40px;
+    position: relative;
+  }
+  .cover .meta-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    max-width: 500px;
+    position: relative;
+  }
+  .cover .meta-item {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 10px;
+  }
+  .cover .meta-item .label { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+  .cover .meta-item .value { font-size: 15px; font-weight: 600; color: var(--accent); margin-top: 4px; }
+
+  /* ─── Section Headers ─── */
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 50px 0 24px 0;
+    padding-bottom: 14px;
+    border-bottom: 2px solid var(--border);
+  }
+  .section-header .num {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #0f172a;
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .section-header h2 {
+    font-size: 24px;
+    font-weight: 700;
+  }
+
+  h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 28px 0 12px 0;
+    color: var(--accent);
+  }
+
+  p { margin-bottom: 12px; }
+
+  /* ─── Code Blocks ─── */
+  pre {
+    background: #0d1117;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 22px;
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    margin: 14px 0 18px 0;
+    color: #c9d1d9;
+    position: relative;
+  }
+  pre .filename {
+    position: absolute;
+    top: 0; right: 0;
+    background: var(--surface2);
+    color: var(--text-dim);
+    font-size: 11px;
+    padding: 3px 12px;
+    border-radius: 0 10px 0 8px;
+    font-family: 'Inter', sans-serif;
+  }
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    background: rgba(56,189,248,0.1);
+    color: var(--accent);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 13px;
+  }
+  pre code {
+    background: none;
+    color: inherit;
+    padding: 0;
+  }
+
+  /* ─── Alert Boxes ─── */
+  .alert {
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin: 16px 0;
+    font-size: 14px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .alert .icon { font-size: 18px; flex-shrink: 0; margin-top: 2px; }
+  .alert-danger {
+    background: rgba(248,113,113,0.08);
+    border: 1px solid rgba(248,113,113,0.25);
+    color: var(--red);
+  }
+  .alert-warn {
+    background: rgba(251,191,36,0.08);
+    border: 1px solid rgba(251,191,36,0.25);
+    color: var(--yellow);
+  }
+  .alert-success {
+    background: rgba(52,211,153,0.08);
+    border: 1px solid rgba(52,211,153,0.25);
+    color: var(--green);
+  }
+  .alert-info {
+    background: rgba(56,189,248,0.08);
+    border: 1px solid rgba(56,189,248,0.25);
+    color: var(--accent);
+  }
+
+  /* ─── Steps ─── */
+  .step {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin: 14px 0;
+  }
+  .step-title {
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .step-title .step-num {
+    background: var(--accent);
+    color: #0f172a;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  /* ─── Tables ─── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 14px 0;
+    font-size: 14px;
+  }
+  th {
+    background: var(--surface2);
+    color: var(--accent);
+    font-weight: 600;
+    text-align: left;
+    padding: 10px 14px;
+  }
+  th:first-child { border-radius: 8px 0 0 0; }
+  th:last-child { border-radius: 0 8px 0 0; }
+  td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(56,189,248,0.03); }
+
+  /* ─── Architecture diagram ─── */
+  .arch-box {
+    background: #0d1117;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin: 18px 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.5;
+    white-space: pre;
+    overflow-x: auto;
+    color: #8b949e;
+  }
+
+  ul, ol {
+    margin: 10px 0 14px 24px;
+  }
+  li { margin-bottom: 6px; }
+
+  .toc {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 30px;
+    margin: 30px 0;
+  }
+  .toc h3 { margin-top: 0; }
+  .toc ol { margin-left: 20px; }
+  .toc li { margin-bottom: 4px; }
+  .toc a { color: var(--accent); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 30px 0;
+  }
+
+  .footer {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 12px;
+    padding: 40px 0;
+    border-top: 1px solid var(--border);
+  }
+
+  @media print {
+    body { background: #0f172a; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .cover { min-height: auto; padding: 60px 40px; }
+    .container { padding: 30px 40px; }
+    pre { white-space: pre-wrap; word-wrap: break-word; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════ COVER ═══════════════════════════ -->
+<div class="cover">
+  <div class="badge">Confidential — Internal Use Only</div>
+  <h1>ReDroid Hardened Android<br>Environment Setup Guide</h1>
+  <p class="subtitle">
+    Complete step-by-step guide to deploy a stealth-hardened, containerized Android 11 environment
+    with Magisk root, GPS spoofing, camera injection, and Play Integrity bypass — optimized for Tinder.
+  </p>
+  <div class="meta-grid">
+    <div class="meta-item">
+      <div class="label">Platform</div>
+      <div class="value">Ubuntu 24.04</div>
+    </div>
+    <div class="meta-item">
+      <div class="label">Android</div>
+      <div class="value">11 (R) x86_64</div>
+    </div>
+    <div class="meta-item">
+      <div class="label">Version</div>
+      <div class="value">v1.0</div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- ═══════════════════════════ TOC ═══════════════════════════ -->
+<div class="toc">
+  <h3>📑 Table of Contents</h3>
+  <ol>
+    <li><a href="#prereqs">Prerequisites &amp; Architecture Overview</a></li>
+    <li><a href="#phase1">Phase 1 — Host System Preparation (Ubuntu + BinderFS)</a></li>
+    <li><a href="#phase2">Phase 2 — Docker &amp; ReDroid Container Deployment</a></li>
+    <li><a href="#phase3">Phase 3 — ADB Connection &amp; scrcpy Display</a></li>
+    <li><a href="#phase4">Phase 4 — Google Account &amp; Play Store Setup</a></li>
+    <li><a href="#phase5">Phase 5 — Magisk Root &amp; Zygisk Configuration</a></li>
+    <li><a href="#phase6">Phase 6 — Vector (LSPosed) Framework Activation</a></li>
+    <li><a href="#phase7">Phase 7 — Stealth Modules (CamSwap, FakeLocation)</a></li>
+    <li><a href="#phase8">Phase 8 — Play Integrity Verification</a></li>
+    <li><a href="#phase9">Phase 9 — Tinder Installation &amp; Authentication</a></li>
+    <li><a href="#phase10">Phase 10 — Network Routing / VPN (ISP Bypass)</a></li>
+    <li><a href="#errors">Common Errors &amp; Solutions Reference</a></li>
+  </ol>
+</div>
+
+<!-- ═══════════════════════════ PREREQS ═══════════════════════════ -->
+<div id="prereqs" class="section-header">
+  <div class="num">0</div>
+  <h2>Prerequisites &amp; Architecture Overview</h2>
+</div>
+
+<h3>System Requirements</h3>
+<table>
+  <tr><th>Component</th><th>Requirement</th></tr>
+  <tr><td>Operating System</td><td><strong>Ubuntu 22.04 / 24.04 LTS</strong> (Native install, NOT WSL2)</td></tr>
+  <tr><td>CPU</td><td>x86_64 with virtualization (Intel VT-x / AMD-V)</td></tr>
+  <tr><td>RAM</td><td>8 GB minimum (16 GB recommended)</td></tr>
+  <tr><td>Disk</td><td>20 GB free space</td></tr>
+  <tr><td>Kernel</td><td>Linux 5.10+ with <code>binder_linux</code> module or BinderFS support</td></tr>
+  <tr><td>Software</td><td>Docker Engine, ADB, scrcpy, sqlite3, Python 3</td></tr>
+</table>
+
+<div class="alert alert-danger">
+  <span class="icon">🚫</span>
+  <div>
+    <strong>Why NOT Windows WSL2?</strong><br>
+    WSL2 uses a Microsoft-maintained kernel that does not include the <code>binder_linux</code> kernel module.
+    Android's Binder IPC is mandatory for ReDroid. Compiling a custom WSL2 kernel is possible
+    but Docker Desktop for Windows does not support custom WSL kernels. You <strong>must</strong> use native Ubuntu.
+  </div>
+</div>
+
+<h3>Architecture Diagram</h3>
+<div class="arch-box">
+┌──────────────────────────────────────────────────────────┐
+│  <span style="color:#38bdf8;">Ubuntu 24.04 LTS Host</span>                                    │
+│                                                          │
+│  ┌─────────────────────────────────────────────────────┐ │
+│  │  <span style="color:#818cf8;">Docker Engine</span>                                       │ │
+│  │                                                     │ │
+│  │  ┌───────────────────────────────────────────────┐  │ │
+│  │  │  <span style="color:#34d399;">ReDroid Container</span> (Android 11 x86_64)          │  │ │
+│  │  │                                               │  │ │
+│  │  │  ┌─────────┐  ┌──────────┐  ┌─────────────┐  │  │ │
+│  │  │  │ Magisk   │  │ Zygisk   │  │ Vector      │  │  │ │
+│  │  │  │ v30.7    │  │ Next 1.5 │  │ (LSPosed)   │  │  │ │
+│  │  │  └─────────┘  └──────────┘  └─────────────┘  │  │ │
+│  │  │                                               │  │ │
+│  │  │  ┌─────────────┐  ┌────────────────────────┐  │  │ │
+│  │  │  │ CamSwap 2.8 │  │ XposedFakeLocation 0.1 │  │  │ │
+│  │  │  └─────────────┘  └────────────────────────┘  │  │ │
+│  │  │                                               │  │ │
+│  │  │  ┌──────────────────────────────────────────┐  │  │ │
+│  │  │  │ GApps + Play Store + Tinder              │  │  │ │
+│  │  │  └──────────────────────────────────────────┘  │  │ │
+│  │  └───────────────────────────────────────────────┘  │ │
+│  └─────────────────────────────────────────────────────┘ │
+│                                                          │
+│  <span style="color:#fbbf24;">BinderFS</span> (/dev/binderfs → /dev/binder, hwbinder, vndbinder) │
+│  <span style="color:#fbbf24;">ADB</span> (localhost:5555) → <span style="color:#fbbf24;">scrcpy</span> (Display Mirror)             │
+└──────────────────────────────────────────────────────────┘
+</div>
+
+<!-- ═══════════════════════════ PHASE 1 ═══════════════════════════ -->
+<div id="phase1" class="page-break section-header">
+  <div class="num">1</div>
+  <h2>Phase 1 — Host System Preparation</h2>
+</div>
+
+<h3>1.1 Install Base Dependencies</h3>
+<pre><code>sudo apt update &amp;&amp; sudo apt upgrade -y
+sudo apt install -y docker.io docker-compose adb scrcpy sqlite3 python3 curl wget git</code></pre>
+
+<h3>1.2 Add Your User to the Docker Group</h3>
+<pre><code>sudo usermod -aG docker $USER
+# Log out and log back in for group changes to take effect</code></pre>
+
+<h3>1.3 Load Binder Kernel Modules</h3>
+<pre><code># Install extra kernel modules (provides binder_linux)
+sudo apt install -y linux-modules-extra-$(uname -r)
+
+# Load the modules
+sudo modprobe binder_linux devices="binder,hwbinder,vndbinder"
+sudo modprobe ashmem_linux</code></pre>
+
+<div class="alert alert-warn">
+  <span class="icon">⚠️</span>
+  <div>
+    <strong>If <code>linux-modules-extra</code> fails to install:</strong><br>
+    Your kernel may already have binder built-in. Skip this step and verify after mounting BinderFS in 1.4.
+    If <code>ls /dev/binderfs/</code> lists devices after mounting, you're fine.
+  </div>
+</div>
+
+<h3>1.4 Mount BinderFS (Critical)</h3>
+<pre><code># Create mount point
+sudo mkdir -p /dev/binderfs
+
+# Mount BinderFS
+sudo mount -t binder binder /dev/binderfs
+
+# Create symlinks
+sudo ln -sf /dev/binderfs/binder /dev/binder
+sudo ln -sf /dev/binderfs/hwbinder /dev/hwbinder
+sudo ln -sf /dev/binderfs/vndbinder /dev/vndbinder
+
+# Verify
+ls -la /dev/binder /dev/hwbinder /dev/vndbinder</code></pre>
+
+<h3>1.5 Make BinderFS Persistent Across Reboots</h3>
+<p>Create a systemd service so BinderFS mounts automatically on every boot:</p>
+<pre><code>sudo tee /etc/systemd/system/binderfs.service &lt;&lt;'EOF'
+[Unit]
+Description=Mount BinderFS for ReDroid
+DefaultDependencies=no
+Before=docker.service
+After=local-fs.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/bash -c '\
+  mkdir -p /dev/binderfs &amp;&amp; \
+  mount -t binder binder /dev/binderfs &amp;&amp; \
+  ln -sf /dev/binderfs/binder /dev/binder &amp;&amp; \
+  ln -sf /dev/binderfs/hwbinder /dev/hwbinder &amp;&amp; \
+  ln -sf /dev/binderfs/vndbinder /dev/vndbinder'
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+sudo systemctl daemon-reload
+sudo systemctl enable --now binderfs.service</code></pre>
+
+<div class="alert alert-danger">
+  <span class="icon">🔴</span>
+  <div>
+    <strong>ERROR YOU WILL HIT WITHOUT THIS:</strong><br>
+    Without BinderFS, the Android <code>keystore</code> daemon crashes in an infinite loop after container restart.
+    This causes <strong>all authentication flows</strong> (Google, Phone, Email) in Tinder to fail with
+    <em>"Oops! Something went wrong"</em>. The error is silent — apps look normal but no crypto tokens can be signed.
+  </div>
+</div>
+
+<!-- ═══════════════════════════ PHASE 2 ═══════════════════════════ -->
+<div id="phase2" class="page-break section-header">
+  <div class="num">2</div>
+  <h2>Phase 2 — Docker &amp; ReDroid Container Deployment</h2>
+</div>
+
+<h3>2.1 Create the Project Directory</h3>
+<pre><code>mkdir -p ~/redroid-android &amp;&amp; cd ~/redroid-android</code></pre>
+
+<h3>2.2 Build a Custom ReDroid Image (GApps + Magisk + NDK)</h3>
+<p>We use the <code>redroid-script</code> tool to build a ReDroid image bundled with Google Play Services, Magisk root, and ARM translation (NDK):</p>
+<pre><code># Clone the image builder
+git clone https://github.com/nickcao/redroid-script.git
+cd redroid-script
+pip3 install -r requirements.txt
+
+# Build the image (this takes 5–10 minutes)
+sudo python3 redroid.py 11.0.0 --gapps --magisk --ndk
+cd ..</code></pre>
+
+<div class="alert alert-info">
+  <span class="icon">💡</span>
+  <div>
+    <strong>What NDK does:</strong> ReDroid runs on x86_64, but most apps (including Tinder) ship ARM native
+    libraries. NDK translation (<code>libnb.so</code>) translates ARM → x86 at runtime, similar to how
+    Apple's Rosetta works.
+  </div>
+</div>
+
+<h3>2.3 Create docker-compose.yml</h3>
+<pre><code><span class="filename">docker-compose.yml</span>services:
+  redroid:
+    image: redroid/redroid:11.0.0_gapps_ndk_magisk
+    container_name: redroid
+    restart: unless-stopped
+    privileged: true
+    ports:
+      - "5555:5555"
+    volumes:
+      - ./data-gapps:/data
+    command:
+      - androidboot.redroid_gpu_mode=guest
+      - androidboot.redroid_fps=60
+      - androidboot.redroid_width=720
+      - androidboot.redroid_height=1280
+      - androidboot.redroid_dpi=320</code></pre>
+
+<div class="alert alert-warn">
+  <span class="icon">⚠️</span>
+  <div>
+    <strong>Do NOT add webcam device mappings</strong> (e.g., <code>/dev/video0</code>).
+    Hardware camera passthrough causes fatal <code>CAMERA_DISCONNECTED</code> errors in ReDroid.
+    We use ART-level camera injection via CamSwap instead (Phase 7).
+  </div>
+</div>
+
+<h3>2.4 Launch the Container</h3>
+<pre><code>cd ~/redroid-android
+docker-compose up -d
+
+# Wait ~15 seconds for Android to boot, then verify
+docker logs redroid 2>&amp;1 | tail -5</code></pre>
+
+<!-- ═══════════════════════════ PHASE 3 ═══════════════════════════ -->
+<div id="phase3" class="page-break section-header">
+  <div class="num">3</div>
+  <h2>Phase 3 — ADB Connection &amp; scrcpy Display</h2>
+</div>
+
+<h3>3.1 Connect ADB</h3>
+<pre><code>adb connect localhost:5555
+
+# Verify device is online
+adb -s localhost:5555 shell getprop ro.product.model</code></pre>
+
+<h3>3.2 Launch scrcpy (Screen Mirror)</h3>
+<pre><code>scrcpy -s localhost:5555 --window-title "ReDroid Android 11"</code></pre>
+<p>This opens an interactive Android window on your desktop. You can click, scroll, and type directly into it.</p>
+
+<div class="alert alert-success">
+  <span class="icon">✅</span>
+  <div>
+    <strong>At this point you should see:</strong> A working Android 11 home screen with the app drawer,
+    Settings, and Play Store visible.
+  </div>
+</div>
+
+<!-- ═══════════════════════════ PHASE 4 ═══════════════════════════ -->
+<div id="phase4" class="section-header">
+  <div class="num">4</div>
+  <h2>Phase 4 — Google Account &amp; Play Store Setup</h2>
+</div>
+
+<div class="step">
+  <div class="step-title"><span class="step-num">1</span> Open Play Store from the app drawer</div>
+  <p>It may take 30–60 seconds for Google Play Services to initialize on first boot.</p>
+</div>
+<div class="step">
+  <div class="step-title"><span class="step-num">2</span> Sign in with a Google account</div>
+  <p>Use the Google account you want for Tinder registration. This account will also serve for "Continue with Google".</p>
+</div>
+<div class="step">
+  <div class="step-title"><span class="step-num">3</span> Verify Play Store works</div>
+  <p>Search for and install any lightweight app (e.g., Calculator) to confirm downloads succeed.</p>
+</div>
+
+<div class="alert alert-warn">
+  <span class="icon">⚠️</span>
+  <div>
+    <strong>If Play Store shows "Device is not certified":</strong><br>
+    Register the device's Google Services Framework ID:
+    <pre style="margin: 8px 0 0 0;"><code>GSFS_ID=$(adb -s localhost:5555 shell "sqlite3 \
+  /data/data/com.google.android.gsf/databases/gservices.db \
+  \"select value from main where name='android_id'\"" 2>/dev/null)
+echo "Register at https://www.google.com/android/uncertified/ : $GSFS_ID"</code></pre>
+    Then restart the container: <code>docker restart redroid</code>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ PHASE 5 ═══════════════════════════ -->
+<div id="phase5" class="page-break section-header">
+  <div class="num">5</div>
+  <h2>Phase 5 — Magisk Root &amp; Zygisk Configuration</h2>
+</div>
+
+<p>The ReDroid image already includes Magisk, but Zygisk must be manually enabled for LSPosed/Vector.</p>
+
+<h3>5.1 Enable Zygisk in Magisk Database</h3>
+<pre><code># Stop the container first
+docker stop redroid
+
+# Enable Zygisk
+sudo sqlite3 ~/redroid-android/data-gapps/adb/magisk.db \
+  "DELETE FROM settings WHERE key='zygisk'; \
+   INSERT INTO settings(key,value) VALUES('zygisk',1);"
+
+# Verify
+sudo sqlite3 ~/redroid-android/data-gapps/adb/magisk.db \
+  "SELECT * FROM settings;"
+
+# Restart
+docker start redroid</code></pre>
+
+<div class="alert alert-danger">
+  <span class="icon">🔴</span>
+  <div>
+    <strong>CRITICAL: Zygisk + Tinder Crash Bug</strong><br>
+    When Zygisk is enabled, Magisk's 32-bit daemon (<code>zygiskd32</code>) intercepts
+    <code>dlopen()</code>, <strong>bypassing the NDK ARM translation bridge</strong> (<code>libnb.so</code>).
+    Tinder's 32-bit ARM library (<code>librive-android.so</code>) is loaded as raw ARM on x86 and crashes:
+    <pre style="margin: 8px 0 0 0;"><code>UnsatisfiedLinkError: "librive-android.so" is for EM_ARM (40) instead of EM_386 (3)</code></pre>
+    <strong>Fix:</strong> After installing all modules (Phase 7), disable Zygisk:
+    <pre style="margin: 8px 0 0 0;"><code>sudo sqlite3 ~/redroid-android/data-gapps/adb/magisk.db \
+  "UPDATE settings SET value=0 WHERE key='zygisk';"
+docker restart redroid</code></pre>
+  </div>
+</div>
+
+<h3>5.2 Install Zygisk-Next Module</h3>
+<pre><code># Download Zygisk-Next
+wget -O /tmp/zygisk-next.zip \
+  "https://github.com/nickcao/zygisk-next/releases/download/v1.5.0/zygisk-next-v1.5.0-release.zip"
+
+# Push to device and install via Magisk
+adb -s localhost:5555 push /tmp/zygisk-next.zip /data/local/tmp/
+adb -s localhost:5555 shell su -c \
+  "magisk --install-module /data/local/tmp/zygisk-next.zip"
+
+docker restart redroid</code></pre>
+
+<h3>5.3 Install Shamiko (Root Hide)</h3>
+<pre><code>wget -O /tmp/shamiko.zip \
+  "https://github.com/nickcao/shamiko/releases/download/v1.2.5/shamiko-v1.2.5-release.zip"
+
+adb -s localhost:5555 push /tmp/shamiko.zip /data/local/tmp/
+adb -s localhost:5555 shell su -c \
+  "magisk --install-module /data/local/tmp/shamiko.zip"
+
+docker restart redroid</code></pre>
+
+<!-- ═══════════════════════════ PHASE 6 ═══════════════════════════ -->
+<div id="phase6" class="page-break section-header">
+  <div class="num">6</div>
+  <h2>Phase 6 — Vector (LSPosed) Framework Activation</h2>
+</div>
+
+<p>Vector is the modern successor to LSPosed. It allows Xposed modules to hook into specific apps at the ART level.</p>
+
+<h3>6.1 Install Vector Module</h3>
+<pre><code>wget -O /tmp/vector.zip \
+  "https://github.com/nickcao/vector/releases/download/v2.2/vector-v2.2-release.zip"
+
+adb -s localhost:5555 push /tmp/vector.zip /data/local/tmp/
+adb -s localhost:5555 shell su -c \
+  "magisk --install-module /data/local/tmp/vector.zip"
+
+docker restart redroid</code></pre>
+
+<h3>6.2 Verify Vector is Running</h3>
+<p>Open the <strong>Vector</strong> app from the app drawer. It should show:</p>
+<ul>
+  <li>Framework Status: <strong>Active</strong></li>
+  <li>API Version: 100</li>
+  <li>Framework Version: 2.2</li>
+</ul>
+
+<div class="alert alert-warn">
+  <span class="icon">⚠️</span>
+  <div>
+    <strong>If Vector shows "Not Activated":</strong><br>
+    Check that Zygisk is enabled (Phase 5.1) and no disable flag exists:
+    <pre style="margin: 8px 0 0 0;"><code># If "disable" file exists, remove it:
+sudo rm -f ~/redroid-android/data-gapps/adb/modules/zygisk_vector/disable
+docker restart redroid</code></pre>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ PHASE 7 ═══════════════════════════ -->
+<div id="phase7" class="page-break section-header">
+  <div class="num">7</div>
+  <h2>Phase 7 — Stealth Modules Installation</h2>
+</div>
+
+<h3>7.1 Install CamSwap (Camera Injection)</h3>
+<p>CamSwap hooks into the Android camera API at the ART level, streaming pre-recorded media from <code>/sdcard/DCIM/</code> as a live camera feed.</p>
+
+<div class="step">
+  <div class="step-title"><span class="step-num">1</span> Install CamSwap APK via Play Store or sideload</div>
+</div>
+<div class="step">
+  <div class="step-title"><span class="step-num">2</span> Enable in Vector</div>
+  <p>Open <strong>Vector → Modules</strong> → Enable <strong>CamSwap</strong> → Add <strong>com.tinder</strong> to its scope.</p>
+</div>
+<div class="step">
+  <div class="step-title"><span class="step-num">3</span> Push media files</div>
+  <pre><code>adb -s localhost:5555 push ~/my-photos/ /sdcard/DCIM/</code></pre>
+</div>
+
+<h3>7.2 Install XposedFakeLocation (GPS Spoofing)</h3>
+
+<div class="step">
+  <div class="step-title"><span class="step-num">1</span> Install APK via Play Store or sideload</div>
+</div>
+<div class="step">
+  <div class="step-title"><span class="step-num">2</span> Enable in Vector — scope to both <code>android</code> and <code>com.tinder</code></div>
+</div>
+<div class="step">
+  <div class="step-title"><span class="step-num">3</span> Inject desired coordinates via XML</div>
+  <pre><code># Create shared_prefs directory
+adb -s localhost:5555 shell su -c \
+  "mkdir -p /data/data/com.noobexon.xposedfakelocation/shared_prefs"
+
+# Write Berlin coordinates (change lat/lng to your target)
+adb -s localhost:5555 shell su -c 'cat &gt; \
+  /data/data/com.noobexon.xposedfakelocation/shared_prefs/location_prefs.xml &lt;&lt;XMLEOF
+&lt;?xml version="1.0" encoding="utf-8" standalone="yes" ?&gt;
+&lt;map&gt;
+  &lt;boolean name="is_playing" value="true" /&gt;
+  &lt;string name="last_clicked_location"&gt;\
+{"latitude":52.5200,"longitude":13.4050}&lt;/string&gt;
+&lt;/map&gt;
+XMLEOF'
+
+docker restart redroid</code></pre>
+</div>
+
+<h3>7.3 ⚡ Disable Zygisk After Module Installation</h3>
+<div class="alert alert-danger">
+  <span class="icon">🔴</span>
+  <div>
+    <strong>MANDATORY — Do this now (prevents Tinder crash):</strong>
+    <pre style="margin: 8px 0 0 0;"><code>docker stop redroid
+sudo sqlite3 ~/redroid-android/data-gapps/adb/magisk.db \
+  "UPDATE settings SET value=0 WHERE key='zygisk';"
+docker start redroid</code></pre>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ PHASE 8 ═══════════════════════════ -->
+<div id="phase8" class="page-break section-header">
+  <div class="num">8</div>
+  <h2>Phase 8 — Play Integrity Verification</h2>
+</div>
+
+<h3>8.1 Install SPIC (Simple Play Integrity Checker)</h3>
+<pre><code>adb -s localhost:5555 shell am start -a android.intent.action.VIEW \
+  -d "market://details?id=com.henrikherzig.playintegritychecker"</code></pre>
+
+<h3>8.2 Run the Check</h3>
+<p>Open SPIC → Tap <strong>"Make Play Integrity Request"</strong></p>
+<table>
+  <tr><th>Verdict</th><th>Expected</th></tr>
+  <tr><td>MEETS_BASIC_INTEGRITY</td><td style="color: #34d399;">✅ Pass</td></tr>
+  <tr><td>MEETS_DEVICE_INTEGRITY</td><td style="color: #34d399;">✅ Pass</td></tr>
+  <tr><td>MEETS_STRONG_INTEGRITY</td><td style="color: #f87171;">❌ Fail (expected for emulators)</td></tr>
+</table>
+<p>Tinder only requires BASIC + DEVICE integrity.</p>
+
+<h3>8.3 If Integrity Fails — Install Integrity-Box</h3>
+<pre><code>wget -O /tmp/integritybox.zip \
+  "https://github.com/.../integrity-box-latest.zip"
+adb -s localhost:5555 push /tmp/integritybox.zip /data/local/tmp/
+adb -s localhost:5555 shell su -c \
+  "magisk --install-module /data/local/tmp/integritybox.zip"
+docker restart redroid</code></pre>
+
+<!-- ═══════════════════════════ PHASE 9 ═══════════════════════════ -->
+<div id="phase9" class="page-break section-header">
+  <div class="num">9</div>
+  <h2>Phase 9 — Tinder Installation &amp; Authentication</h2>
+</div>
+
+<h3>9.1 Install Tinder from Play Store</h3>
+<pre><code>adb -s localhost:5555 shell am start -a android.intent.action.VIEW \
+  -d "market://details?id=com.tinder"</code></pre>
+
+<h3>9.2 Launch Tinder</h3>
+<pre><code>adb -s localhost:5555 shell am start \
+  -n com.tinder/.launch.internal.activities.LoginActivity</code></pre>
+
+<h3>9.3 Authentication Methods</h3>
+<table>
+  <tr><th>Method</th><th>Requirements</th></tr>
+  <tr><td>Continue with Google</td><td>Google account signed into the device</td></tr>
+  <tr><td>Continue with Phone</td><td>Valid phone number that can receive SMS</td></tr>
+  <tr><td>Continue with Email</td><td>Valid email (Proton Mail, Gmail, etc.)</td></tr>
+</table>
+
+<!-- ═══════════════════════════ PHASE 10 ═══════════════════════════ -->
+<div id="phase10" class="page-break section-header">
+  <div class="num">10</div>
+  <h2>Phase 10 — Network Routing / VPN (ISP Bypass)</h2>
+</div>
+
+<div class="alert alert-danger">
+  <span class="icon">🔴</span>
+  <div>
+    <strong>CRITICAL: ISP-Level Blocking</strong><br>
+    If your host is in a country where Tinder is banned (e.g., Pakistan), the ISP performs DPI and silently
+    drops TLS connections to <code>api.gotinder.com</code>. All login methods will show
+    <em>"Oops! Something went wrong"</em>.
+    <br><br>
+    Additionally, GPS spoofing alone is <strong>not sufficient</strong>. Tinder's anti-fraud (DataDome)
+    cross-references GPS coordinates against network IP geolocation. A mismatch triggers instant rejection.
+  </div>
+</div>
+
+<h3>10.1 Test Connectivity First</h3>
+<pre><code># Check your public IP
+curl -s https://ipinfo.io/json
+
+# Test if Tinder API is reachable
+curl -Iv --connect-timeout 5 https://api.gotinder.com 2>&amp;1 | head -10
+
+# If "Connection timed out" → VPN is REQUIRED</code></pre>
+
+<h3>10.2 Solution: Connect VPN on Ubuntu Host</h3>
+<p>Because ReDroid shares the host's network, connecting a VPN on Ubuntu tunnels all Android traffic automatically.</p>
+<pre><code># Option A: OpenVPN
+sudo apt install -y openvpn
+sudo openvpn --config germany-berlin.ovpn
+
+# Option B: WireGuard
+sudo apt install -y wireguard
+sudo wg-quick up wg0
+
+# Option C: Install a VPN app inside Android (Play Store)
+# Works in privileged containers since /dev/net/tun exists</code></pre>
+
+<div class="alert alert-info">
+  <span class="icon">💡</span>
+  <div>
+    <strong>Best practice:</strong> Use a German server (Frankfurt/Berlin) to match the spoofed GPS coordinates.
+  </div>
+</div>
+
+<!-- ═══════════════════════════ ERRORS TABLE ═══════════════════════════ -->
+<div id="errors" class="page-break section-header">
+  <div class="num">⚡</div>
+  <h2>Common Errors &amp; Solutions Reference</h2>
+</div>
+
+<table>
+  <tr>
+    <th style="width:35%;">Error</th>
+    <th style="width:25%;">Root Cause</th>
+    <th style="width:40%;">Solution</th>
+  </tr>
+  <tr>
+    <td><code>UnsatisfiedLinkError: EM_ARM instead of EM_386</code></td>
+    <td>Zygisk bypasses NDK translation bridge</td>
+    <td>Disable Zygisk in <code>magisk.db</code>, restart container</td>
+  </tr>
+  <tr>
+    <td>"Oops! Something went wrong" on all auth</td>
+    <td>BinderFS not mounted → keystore crash loop</td>
+    <td>Mount BinderFS + install systemd service (Phase 1.4–1.5)</td>
+  </tr>
+  <tr>
+    <td>"Oops!" with BinderFS OK</td>
+    <td>ISP blocking <code>api.gotinder.com</code></td>
+    <td>Connect VPN on Ubuntu host (Phase 10)</td>
+  </tr>
+  <tr>
+    <td>Vector: "Not Activated"</td>
+    <td>Zygisk off or <code>disable</code> flag file</td>
+    <td>Enable Zygisk, rm disable flag, restart</td>
+  </tr>
+  <tr>
+    <td><code>CAMERA_DISCONNECTED</code></td>
+    <td>Webcam device mapped in docker-compose</td>
+    <td>Remove <code>/dev/video0</code> mapping; use CamSwap</td>
+  </tr>
+  <tr>
+    <td>"Device is not certified"</td>
+    <td>GSF ID not registered with Google</td>
+    <td>Register at google.com/android/uncertified/</td>
+  </tr>
+  <tr>
+    <td>Docker fails on WSL2</td>
+    <td>WSL2 kernel lacks binder module</td>
+    <td>Use native Ubuntu instead</td>
+  </tr>
+  <tr>
+    <td><code>WarmUpDeviceCheckWorker: FAILURE</code></td>
+    <td>Play Integrity fails</td>
+    <td>Install Integrity-Box module (Phase 8.3)</td>
+  </tr>
+  <tr>
+    <td>GPS reads 0,0 in Tinder</td>
+    <td>FakeLocation not scoped to <code>android</code> + <code>com.tinder</code></td>
+    <td>Add both to Vector module scope, restart</td>
+  </tr>
+</table>
+
+<hr class="divider">
+
+<h2 style="margin-bottom: 16px;">🔧 Quick Command Reference</h2>
+<table>
+  <tr><th>Action</th><th>Command</th></tr>
+  <tr><td>Start container</td><td><code>cd ~/redroid-android &amp;&amp; docker-compose up -d</code></td></tr>
+  <tr><td>Stop container</td><td><code>docker stop redroid</code></td></tr>
+  <tr><td>Restart container</td><td><code>docker restart redroid</code></td></tr>
+  <tr><td>Connect ADB</td><td><code>adb connect localhost:5555</code></td></tr>
+  <tr><td>Screen mirror</td><td><code>scrcpy -s localhost:5555 --window-title "ReDroid"</code></td></tr>
+  <tr><td>View crash logs</td><td><code>adb -s localhost:5555 logcat -b crash</code></td></tr>
+  <tr><td>Launch Tinder</td><td><code>adb -s localhost:5555 shell monkey -p com.tinder 1</code></td></tr>
+  <tr><td>Check Zygisk</td><td><code>sudo sqlite3 ~/redroid-android/data-gapps/adb/magisk.db "SELECT * FROM settings;"</code></td></tr>
+  <tr><td>Check BinderFS</td><td><code>ls -la /dev/binder /dev/hwbinder /dev/vndbinder</code></td></tr>
+  <tr><td>Check public IP</td><td><code>curl -s https://ipinfo.io/json</code></td></tr>
+</table>
+
+<div class="footer">
+  <p>ReDroid Hardened Android Environment — Developer Setup Guide v1.0</p>
+  <p>Generated October 2026 — Confidential</p>
+</div>
+
+</div>
+</body>
+</html>
